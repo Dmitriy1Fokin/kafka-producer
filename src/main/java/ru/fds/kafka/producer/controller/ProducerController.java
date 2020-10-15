@@ -20,6 +20,7 @@ public class ProducerController {
     @GetMapping("send")
     public String sendSimpleMessage(@RequestParam("msg") String message){
         producerService.sendMessage(message);
+        producerService.sendMessagePartition(message);
         return HttpStatus.OK.toString();
     }
 

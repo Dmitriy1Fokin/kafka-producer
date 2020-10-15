@@ -1,6 +1,7 @@
 package ru.fds.kafka.producer.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
@@ -14,22 +15,31 @@ public class ProducerServiceImpl implements ProducerService {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final Constants constants;
+    private final NewTopic topic;
 
     public ProducerServiceImpl(KafkaTemplate<String, String> kafkaTemplate,
-                               Constants constants) {
+                               Constants constants,
+                               NewTopic topic) {
         this.kafkaTemplate = kafkaTemplate;
         this.constants = constants;
+        this.topic = topic;
     }
 
     @Override
     public void sendMessage(String msg) {
         log.info("topic name: {}, message: {}", constants.getTopicNameSimple(), msg);
-        kafkaTemplate.send(constants.getTopicNameSimple(), msg);
+        kafkaTemplate.send(topic.name(), 0, "ss", msg);
+    }
+
+    @Override
+    public void sendMessagePartition(String msg) {
+        log.info("topic name: {}, message: {}", constants.getTopicNameSimple(), msg);
+        kafkaTemplate.send(topic.name(), 1, "ssqq", msg);
     }
 
     @Override
     public void sendMessageWithCallback(String msg){
-        log.info("topic name: {}, message: {}", constants.getTopicNameSimple(), msg);
+        log.info("topic name: {}, message: {}", constants.getTopicNameCallback(), msg);
 
         ListenableFuture<SendResult<String, String>> future =
                 kafkaTemplate.send(constants.getTopicNameSimple(), msg);
