@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.fds.kafka.producer.service.ProducerService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/producer")
 public class ProducerController {
@@ -30,4 +32,8 @@ public class ProducerController {
         return HttpStatus.OK.toString();
     }
 
+    @GetMapping("send/filter")
+    public List<Integer> sendMessageFilter() {
+        return producerService.sendMessageFilter();
+    }
 }
