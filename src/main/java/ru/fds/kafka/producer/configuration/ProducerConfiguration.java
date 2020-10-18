@@ -8,7 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 import ru.fds.kafka.producer.Constants;
+import ru.fds.kafka.producer.dto.Message;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +25,10 @@ public class ProducerConfiguration {
     }
 
     @Bean
+    public KafkaTemplate<String, String> kafkaStringTemplate() {
+        return new KafkaTemplate<>(producerStringFactory());
+    }
+
     public ProducerFactory<String, String> producerStringFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, constants.getBootstrapAddress());
@@ -31,7 +37,13 @@ public class ProducerConfiguration {
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
+
+
     @Bean
+    public KafkaTemplate<String, Integer> kafkaIntegerTemplate() {
+        return new KafkaTemplate<>(producerIntegerFactory());
+    }
+
     public ProducerFactory<String, Integer> producerIntegerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, constants.getBootstrapAddress());
@@ -40,13 +52,18 @@ public class ProducerConfiguration {
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
-    @Bean
-    public KafkaTemplate<String, String> kafkaStringTemplate() {
-        return new KafkaTemplate<>(producerStringFactory());
-    }
+
 
     @Bean
-    public KafkaTemplate<String, Integer> kafkaIntegerTemplate() {
-        return new KafkaTemplate<>(producerIntegerFactory());
+    public KafkaTemplate<String, Message> messageKafkaTemplate() {
+        return new KafkaTemplate<>(messageProducerFactory());
+    }
+
+    public ProducerFactory<String, Message> messageProducerFactory() {
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, constants.getBootstrapAddress());
+        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        return new DefaultKafkaProducerFactory<>(configProps);
     }
 }

@@ -15,5 +15,5 @@ public class Constants {
     private String topicNameSimple;
     private String topicNameCallback;
     private String topicNameFilter;
-
+    private String topicNameObject;
 }

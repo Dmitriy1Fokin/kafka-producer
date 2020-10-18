@@ -2,9 +2,11 @@ package ru.fds.kafka.producer.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.fds.kafka.producer.dto.Message;
 import ru.fds.kafka.producer.service.ProducerService;
 
 import java.util.List;
@@ -35,5 +37,11 @@ public class ProducerController {
     @GetMapping("send/filter")
     public List<Integer> sendMessageFilter() {
         return producerService.sendMessageFilter();
+    }
+
+    @GetMapping("send/messageObject")
+    public HttpStatus sendMessageObject(@RequestBody Message message){
+        producerService.sendMessageCustomObject(message);
+        return HttpStatus.OK;
     }
 }

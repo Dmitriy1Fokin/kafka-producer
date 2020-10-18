@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 import ru.fds.kafka.producer.Constants;
+import ru.fds.kafka.producer.dto.Message;
 
 import java.util.List;
 import java.util.Random;
@@ -19,15 +20,18 @@ public class ProducerServiceImpl implements ProducerService {
 
     private final KafkaTemplate<String, String> kafkaStringTemplate;
     private final KafkaTemplate<String, Integer> kafkaIntegerTemplate;
+    private final KafkaTemplate<String, Message> messageKafkaTemplate;
     private final Constants constants;
     private final NewTopic topic;
 
     public ProducerServiceImpl(KafkaTemplate<String, String> kafkaStringTemplate,
                                KafkaTemplate<String, Integer> kafkaIntegerTemplate,
+                               KafkaTemplate<String, Message> messageKafkaTemplate,
                                Constants constants,
                                NewTopic topic) {
         this.kafkaStringTemplate = kafkaStringTemplate;
         this.kafkaIntegerTemplate = kafkaIntegerTemplate;
+        this.messageKafkaTemplate = messageKafkaTemplate;
         this.constants = constants;
         this.topic = topic;
     }
@@ -74,5 +78,11 @@ public class ProducerServiceImpl implements ProducerService {
         log.info("sendMessageFilter. topic name: {}, message: {}", constants.getTopicNameFilter(), intValues);
         intValues.forEach(integer ->  kafkaIntegerTemplate.send(constants.getTopicNameFilter(), integer));
         return intValues;
+    }
+
+    @Override
+    public void sendMessageCustomObject(Message message){
+        log.info("sendMessageCustomObject. topic name: {}, message: {}", constants.getTopicNameObject(), message);
+        messageKafkaTemplate.send(constants.getTopicNameObject(), message);
     }
 }
