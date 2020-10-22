@@ -6,9 +6,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import ru.fds.kafka.producer.dto.Message;
 import ru.fds.kafka.producer.service.ProducerService;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -43,5 +45,14 @@ public class ProducerController {
     public HttpStatus sendMessageObject(@RequestBody Message message){
         producerService.sendMessageCustomObject(message);
         return HttpStatus.OK;
+    }
+
+    @GetMapping("send/file")
+    public String sendFile(@RequestParam("file") MultipartFile file){
+        try {
+            return producerService.sendFile(file);
+        } catch (IOException e) {
+            return e.getLocalizedMessage();
+        }
     }
 }

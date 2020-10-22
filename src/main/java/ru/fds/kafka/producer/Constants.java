@@ -16,4 +16,5 @@ public class Constants {
     private String topicNameCallback;
     private String topicNameFilter;
     private String topicNameObject;
+    private String topicNameFile;
 }

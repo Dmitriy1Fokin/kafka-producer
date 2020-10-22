@@ -7,10 +7,13 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
+import org.springframework.web.multipart.MultipartFile;
 import ru.fds.kafka.producer.Constants;
 import ru.fds.kafka.producer.dto.Message;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -20,18 +23,21 @@ public class ProducerServiceImpl implements ProducerService {
 
     private final KafkaTemplate<String, String> kafkaStringTemplate;
     private final KafkaTemplate<String, Integer> kafkaIntegerTemplate;
-    private final KafkaTemplate<String, Message> messageKafkaTemplate;
+    private final KafkaTemplate<String, Message> kafkaMessageTemplate;
+    private final KafkaTemplate<String, byte[]> kafkaFileTemplate;
     private final Constants constants;
     private final NewTopic topic;
 
     public ProducerServiceImpl(KafkaTemplate<String, String> kafkaStringTemplate,
                                KafkaTemplate<String, Integer> kafkaIntegerTemplate,
-                               KafkaTemplate<String, Message> messageKafkaTemplate,
+                               KafkaTemplate<String, Message> kafkaMessageTemplate,
+                               KafkaTemplate<String, byte[]> kafkaFileTemplate,
                                Constants constants,
                                NewTopic topic) {
         this.kafkaStringTemplate = kafkaStringTemplate;
         this.kafkaIntegerTemplate = kafkaIntegerTemplate;
-        this.messageKafkaTemplate = messageKafkaTemplate;
+        this.kafkaMessageTemplate = kafkaMessageTemplate;
+        this.kafkaFileTemplate = kafkaFileTemplate;
         this.constants = constants;
         this.topic = topic;
     }
@@ -83,6 +89,14 @@ public class ProducerServiceImpl implements ProducerService {
     @Override
     public void sendMessageCustomObject(Message message){
         log.info("sendMessageCustomObject. topic name: {}, message: {}", constants.getTopicNameObject(), message);
-        messageKafkaTemplate.send(constants.getTopicNameObject(), message);
+        kafkaMessageTemplate.send(constants.getTopicNameObject(), message);
     }
+
+    @Override
+    public String sendFile(MultipartFile file) throws IOException {
+        log.info("sendFile. topic name: {}, message: {}", constants.getTopicNameFile(), file.getOriginalFilename());
+        kafkaFileTemplate.send(constants.getTopicNameFile(), Objects.requireNonNull(file.getOriginalFilename()), file.getBytes());
+        return file.getOriginalFilename();
+    }
+
 }
